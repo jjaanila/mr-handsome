@@ -1,0 +1,14 @@
+{
+  "name": "MrHandsome",
+  "version": "0.0.1",
+
+  "dependencies": {
+    "discord.js": "*",
+    "bluebird": "*",
+    "lodash": "*",
+    "bunyan": "*"
+  },
+
+  "devDependencies": {
+  }
+}
