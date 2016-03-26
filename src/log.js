@@ -13,13 +13,14 @@ var log = bunyan.createLogger({
             stream: process.stdout
         },
         {
-            level: "error",
+            level: "warn",
             path: LOG_FILE_PATH
         }
     ]
 });
 
 module.exports = {
+    trace: log.trace.bind(log),
     debug: log.debug.bind(log),
     info: log.info.bind(log),
     warn: log.warn.bind(log),
