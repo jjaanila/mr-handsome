@@ -1,15 +1,12 @@
-/**
- * Created by jay on 25.3.2016.
- */
-
 var bunyan = require("bunyan");
 
 var LOG_FILE_PATH = "./handsome.log";
+
 var log = bunyan.createLogger({
     name: "MrHandsome",
     streams: [
         {
-            level: "debug",
+            level: "trace",
             stream: process.stdout
         },
         {

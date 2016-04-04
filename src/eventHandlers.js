@@ -1,7 +1,3 @@
-/**
- * Created by jay on 26.3.2016.
- */
-
 var Promise = require("bluebird");
 var _ = require("lodash");
 var log = require("./log");
@@ -66,13 +62,15 @@ function initEventHandlers(client) {
 }
 
 function voiceJoinHandler(client, voiceChannel, user) {
-    if (client.user.status !== "online" || floodTimeout !== null) {return;}
+    if (client.user.status !== "online" ||
+        floodTimeout !== null ||
+        user.username === "Mr. Handsome") {return;}
 
     var textChannel = getMainTextChannel(client);
     if (!textChannel) {
         return;
     }
-    var content = user.username + " to " + voiceChannel.name;
+    var content = user.username + " now in " + voiceChannel.name;
     return client.sendMessage(textChannel, content, {tts: true})
         .then(function() {
             floodTimeout = setTimeout(function() {
@@ -80,7 +78,7 @@ function voiceJoinHandler(client, voiceChannel, user) {
             }, FLOOD_PREVENTION_TIME);
         })
         .catch(function(err) {
-            log.info("voiceJoin: sendMessage failed", err);
+            log.warn("voiceJoin: sendMessage failed", err);
         });
 }
 

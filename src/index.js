@@ -1,8 +1,3 @@
-/**
- * Created by jay on 26.3.2016.
- */
-
-
 var Promise = require("bluebird");
 var Discord = require("discord.js");
 var log = require("./log");
@@ -13,6 +8,11 @@ var client = null;
 function initialize() {
     client = new Discord.Client();
     eventHandlers.initEventHandlers(client);
+
+    process.on("unhandledRejection", function(err, promise) {
+        log.error("Unhandled rejection", err);
+        throw err;
+    });
 }
 
 function start() {
