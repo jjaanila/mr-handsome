@@ -9,35 +9,39 @@ var RESOURCE_PATH = "./res/";
 var COMMAND_PREFIX = "!";
 
 var commands = {
-    "help": {
+    help: {
         action: help,
         description: "Print help message"
     },
-    "mute": {
+    mute: {
         action: mute,
         description: "Mute me"
     },
-    "wake": {
+    wake: {
         action: wakeUp,
         description: "Wake me up"
     },
-    "wtf": {
+    wtf: {
         action: linkWTFSong,
         description: "So what's the big fucking deal?"
     },
-    "jth": {
+    jth: {
         action: playJussi,
         description: "Kuka muu muka?"
+    },
+    roll: {
+        action: roll,
+        description: "Roll between two numbers. !roll <low> <high>"
     }
 };
 
 function handleCommands(client, message) {
-    var commandRE = new RegExp("^" + COMMAND_PREFIX);
-    if (!commandRE.test(message.content)) {
+    var commandRE = new RegExp("^" + "!" + "(\\w+)");
+    var commandMatch = message.content.match(commandRE);
+    if (!commandMatch) {
         return Promise.resolve();
     }
-    var commandStr = message.content.slice(1);
-    var command = commands[commandStr];
+    var command = commands[commandMatch.slice(1)];
     if (!command) {
         log.trace("Unknown command: " + commandStr);
         return Promise.resolve();
@@ -124,6 +128,30 @@ function playJussi(client, message) {
         })
         .catch(function(err) {
             log.warn("playJussi", err);
+        });
+}
+
+function roll(client, message) {
+    var high = 100;
+    var low = 0;
+    var parameters = message.content.split(" ");
+    console.log(parameters);
+    console.log(parameters.length);
+    if ((parameters.length !== 3 && parameters.length !== 1) ||
+        ((parameters.length === 3) && (parameters[2] < parameters[1]))) {
+            return client.reply(message, commands.roll.description + ", you dumbo.")
+                .catch(function(err) {
+                    log.warn("roll", err);
+                });
+    }
+    if (parameters.length === 3) {
+        low = parseInt(parameters[1]);
+        high = parseInt(parameters[2]);
+    }
+    var result = "rolled " + Math.floor((Math.random() * high) + low) + ". (" + low + " - " + high + ")";
+    return client.reply(message, result)
+        .catch(function() {
+           log.warn("roll", err);
         });
 }
 
