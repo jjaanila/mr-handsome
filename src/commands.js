@@ -2,6 +2,7 @@ var _ = require("lodash");
 var log = require("./log");
 var Promise = require("bluebird");
 var fs = Promise.promisifyAll(require("fs"));
+var rp = require("request-promise");
 
 var WTF_SONG_URL = "https://www.youtube.com/watch?v=k78OjoJZcVc";
 var RESOURCE_PATH = "./res/";
@@ -32,6 +33,10 @@ var commands = {
     roll: {
         action: roll,
         description: "Roll between two numbers. !roll <low> <high>"
+    },
+    joke: {
+        action: joke,
+        description: "I know some funny stuff... !joke [target]"
     }
 };
 
@@ -135,13 +140,11 @@ function roll(client, message) {
     var high = 100;
     var low = 0;
     var parameters = message.content.split(" ");
-    console.log(parameters);
-    console.log(parameters.length);
     if ((parameters.length !== 3 && parameters.length !== 1) ||
         ((parameters.length === 3) && (parameters[2] < parameters[1]))) {
             return client.reply(message, commands.roll.description + ", you dumbo.")
                 .catch(function(err) {
-                    log.warn("roll", err);
+                    log.warn("roll", err.message);
                 });
     }
     if (parameters.length === 3) {
@@ -151,7 +154,29 @@ function roll(client, message) {
     var result = "rolled " + Math.floor((Math.random() * high) + low) + ". (" + low + " - " + high + ")";
     return client.reply(message, result)
         .catch(function() {
-           log.warn("roll", err);
+           log.warn("roll", err.message);
+        });
+}
+
+function joke(client, message) {
+    var jokeSubject = message.author.username;
+    var parameters = message.content.split(" ");
+    if (parameters.length > 1) {
+        jokeSubject = parameters.slice(1).join(" ");
+    }
+    var options = {
+        uri: "http://api.icndb.com/jokes/random?escape=javascript&limitTo=[explicit]&lastName=&firstName=" + jokeSubject
+    };
+    return rp(options)
+        .then(function(response) {
+            var responseJson = JSON.parse(response);
+            if (responseJson.type !== "success") {
+                throw new Error("Joke service failed");
+            }
+            return client.sendMessage(message.channel, responseJson.value.joke);
+        })
+        .catch(function(err) {
+            log.warn("joke", err.message);
         });
 }
 

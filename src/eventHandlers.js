@@ -32,8 +32,7 @@ function initEventHandlers(client) {
         log.info("READY");
         client.setStatusIdle();
         setTimeout(function() {
-            log.info("Unmuted after startup");
-            client.setStatusActive();
+            log.trace("voiceJoin handler registered");
             client.on("voiceJoin", function(voiceChannel, user) {
                 return voiceJoinHandler(client, voiceChannel, user);
             });

@@ -6,7 +6,8 @@
     "discord.js": "6.1.0",
     "bluebird": "3.3.4",
     "lodash": "4.7.0",
-    "bunyan": "1.8.0"
+    "bunyan": "1.8.0",
+    "request-promise": "2.0.1"
   },
 
   "devDependencies": {
