@@ -46,7 +46,8 @@ function handleCommands(client, message) {
     if (!commandMatch) {
         return Promise.resolve();
     }
-    var command = commands[commandMatch.slice(1)];
+    var commandStr = commandMatch.slice(1);
+    var command = commands[commandStr];
     if (!command) {
         log.trace("Unknown command: " + commandStr);
         return Promise.resolve();
