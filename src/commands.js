@@ -1,15 +1,13 @@
-var _ = require("lodash");
-var log = require("./log");
-var Promise = require("bluebird");
-var fs = Promise.promisifyAll(require("fs"));
-var rp = require("request-promise");
+const _ = require("lodash");
+const log = require("./log");
+const rp = require("request-promise");
 
-var WTF_SONG_URL = "https://www.youtube.com/watch?v=k78OjoJZcVc";
-var RESOURCE_PATH = "./res/";
+const WTF_SONG_URL = "https://www.youtube.com/watch?v=k78OjoJZcVc";
+const RESOURCE_PATH = "./res/";
 
-var COMMAND_PREFIX = "!";
+const COMMAND_PREFIX = "!";
 
-var commands = {
+const commands = {
     help: {
         action: help,
         description: "Print help message"
@@ -41,22 +39,24 @@ var commands = {
 };
 
 function handleCommands(client, message) {
-    var commandRE = new RegExp("^" + "!" + "(\\w+)");
-    var commandMatch = message.content.match(commandRE);
-    if (!commandMatch) {
-        return Promise.resolve();
-    }
-    var commandStr = commandMatch.slice(1);
-    var command = commands[commandStr];
-    if (!command) {
-        log.trace("Unknown command: " + commandStr);
-        return Promise.resolve();
-    }
-   return command.action(client, message);
+    return Promise.resolve().then(() => {
+        const commandRE = new RegExp("^" + "!" + "(\\w+)");
+        const commandMatch = message.content.match(commandRE);
+        if (!commandMatch) {
+            return;
+        }
+        const commandStr = commandMatch.slice(1);
+        const command = commands[commandStr];
+        if (!command) {
+            log.trace("Unknown command: " + commandStr);
+            return;
+        }
+        return command.action(client, message);
+    });
 }
 
 function help(client, message) {
-    var content = "\n";
+    const content = "\n";
     _.forOwn(commands, function(command, name) {
         content += COMMAND_PREFIX + name + " - " + command.description + "\n";
     });
@@ -68,7 +68,7 @@ function help(client, message) {
 
 function wakeUp(client, message) {
     if (client.user.status !== "online") {
-        client.setStatusActive()
+        return client.setStatusActive()
             .then(function() {
                 return client.reply(message, "Ha! I knew you couldn't live without me!");
             })
@@ -102,7 +102,7 @@ function playJussi(client, message) {
         .catch(function(err) {
             log.warn("playJussi", err);
         });
-    var voiceChannel = message.author.voiceChannel;
+    const voiceChannel = message.author.voiceChannel;
     if (!voiceChannel) {
         return client.reply(message, "Join some voice channel first!")
             .catch(function(err) {
@@ -138,9 +138,9 @@ function playJussi(client, message) {
 }
 
 function roll(client, message) {
-    var high = 100;
-    var low = 0;
-    var parameters = message.content.split(" ");
+    const high = 100;
+    const low = 0;
+    const parameters = message.content.split(" ");
     if ((parameters.length !== 3 && parameters.length !== 1) ||
         ((parameters.length === 3) && (parameters[2] < parameters[1]))) {
             return client.reply(message, commands.roll.description + ", you dumbo.")
@@ -152,7 +152,7 @@ function roll(client, message) {
         low = parseInt(parameters[1]);
         high = parseInt(parameters[2]);
     }
-    var result = "rolled " + Math.floor((Math.random() * high) + low) + ". (" + low + " - " + high + ")";
+    const result = "rolled " + Math.floor((Math.random() * high) + low) + ". (" + low + " - " + high + ")";
     return client.reply(message, result)
         .catch(function() {
            log.warn("roll", err.message);
@@ -160,17 +160,17 @@ function roll(client, message) {
 }
 
 function joke(client, message) {
-    var jokeSubject = message.author.username;
-    var parameters = message.content.split(" ");
+    const jokeSubject = message.author.username;
+    const parameters = message.content.split(" ");
     if (parameters.length > 1) {
         jokeSubject = parameters.slice(1).join(" ");
     }
-    var options = {
+    const options = {
         uri: "http://api.icndb.com/jokes/random?escape=javascript&limitTo=[explicit]&lastName=&firstName=" + jokeSubject
     };
     return rp(options)
         .then(function(response) {
-            var responseJson = JSON.parse(response);
+            const responseJson = JSON.parse(response);
             if (responseJson.type !== "success") {
                 throw new Error("Joke service failed");
             }

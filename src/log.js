@@ -1,18 +1,12 @@
-var bunyan = require("bunyan");
+const bunyan = require("bunyan");
 
-var LOG_FILE_PATH = "./handsome.log";
-
-var log = bunyan.createLogger({
-    name: "MrHandsome",
+const log = bunyan.createLogger({
+    name: "mr-handsome",
     streams: [
         {
-            level: "trace",
+            level: "info",
             stream: process.stdout
         },
-        {
-            level: "warn",
-            path: LOG_FILE_PATH
-        }
     ]
 });
 

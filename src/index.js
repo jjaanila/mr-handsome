@@ -1,26 +1,30 @@
-var Promise = require("bluebird");
-var Discord = require("discord.js");
-var log = require("./log");
-var eventHandlers = require("./eventHandlers");
+const Discord = require("discord.js");
+const log = require("./log");
+const eventHandlers = require("./eventHandlers");
+const settings = require("./settings");
 
-var client = null;
+let client = null;
 
 function initialize() {
     client = new Discord.Client();
     eventHandlers.initEventHandlers(client);
 
-    process.on("unhandledRejection", function(err, promise) {
+    process.on("unhandledRejection", function(err) {
         log.error("Unhandled rejection", err);
         throw err;
     });
 }
 
 function start() {
-    var authDetails = require("../secure.json");
-    client.login(authDetails.email, authDetails.password)
-        .catch(function(err) {
-            log.error("Login failed", err);
-        });
+    return Promise.resolve().then(() => {
+        if (!settings.discord.token) {
+            throw new Error("settings.discord.token is missing!");
+        }
+        return client.login(settings.discord.token)
+    })
+    .catch(function(err) {
+        log.error("Login failed", err);
+    });
 }
 
 initialize();
