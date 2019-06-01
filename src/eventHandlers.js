@@ -37,6 +37,9 @@ function initEventHandlers(client) {
     });
 
     client.on("message", function(message) {
+        if (message.author.id === client.user.id) {
+            return;
+        }
         return commands.handleCommands(client, message);
     });
 }

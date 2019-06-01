@@ -56,11 +56,11 @@ function handleCommands(client, message) {
 }
 
 function help(client, message) {
-    const content = "\n";
+    let content = "\n";
     _.forOwn(commands, function(command, name) {
         content += COMMAND_PREFIX + name + " - " + command.description + "\n";
     });
-    return client.reply(message, content)
+    return message.channel.send(content)
         .catch(function(err) {
             log.warn("help", err);
         });
@@ -68,9 +68,9 @@ function help(client, message) {
 
 function wakeUp(client, message) {
     if (client.user.status !== "online") {
-        return client.setStatusActive()
+        return client.user.setStatus("online")
             .then(function() {
-                return client.reply(message, "Ha! I knew you couldn't live without me!");
+                return message.channel.send("Ha! I knew you couldn't live without me!");
             })
             .catch(function(err) {
                 log.warn("wakeUp", err);
@@ -80,9 +80,9 @@ function wakeUp(client, message) {
 
 function mute(client, message) {
     if (client.user.status !== "idle") {
-        client.setStatusIdle()
+        client.user.setStatus("idle")
             .then(function() {
-                return client.reply(message, "Hmph...");
+                return message.channel.send("Hmph...");
             })
             .catch(function(err) {
                 log.warn("mute", err);
@@ -91,20 +91,20 @@ function mute(client, message) {
 }
 
 function linkWTFSong(client, message) {
-    return client.reply(message, WTF_SONG_URL)
+    return message.channel.send(WTF_SONG_URL)
     .catch(function(err) {
         log.warn("linkWTFSong", err);
     });
 }
 
 function playJussi(client, message) {
-    return client.reply(message, "Work in progress...")
+    return message.channel.send("Work in progress...")
         .catch(function(err) {
             log.warn("playJussi", err);
         });
     const voiceChannel = message.author.voiceChannel;
     if (!voiceChannel) {
-        return client.reply(message, "Join some voice channel first!")
+        return message.channel.send("Join some voice channel first!")
             .catch(function(err) {
                 log.warn("playJussi", err);
             });
@@ -143,7 +143,7 @@ function roll(client, message) {
     const parameters = message.content.split(" ");
     if ((parameters.length !== 3 && parameters.length !== 1) ||
         ((parameters.length === 3) && (parameters[2] < parameters[1]))) {
-            return client.reply(message, commands.roll.description + ", you dumbo.")
+            return message.channel.send(commands.roll.description + ", you dumbo.")
                 .catch(function(err) {
                     log.warn("roll", err.message);
                 });
@@ -152,8 +152,8 @@ function roll(client, message) {
         low = parseInt(parameters[1]);
         high = parseInt(parameters[2]);
     }
-    const result = "rolled " + Math.floor((Math.random() * high) + low) + ". (" + low + " - " + high + ")";
-    return client.reply(message, result)
+    const result = `${message.author.username} rolled ${Math.floor((Math.random() * high) + low)} (${low} - ${high})`;
+    return message.channel.send(result)
         .catch(function() {
            log.warn("roll", err.message);
         });
@@ -174,7 +174,7 @@ function joke(client, message) {
             if (responseJson.type !== "success") {
                 throw new Error("Joke service failed");
             }
-            return client.sendMessage(message.channel, responseJson.value.joke);
+            return message.channel.send(responseJson.value.joke);
         })
         .catch(function(err) {
             log.warn("joke", err.message);
