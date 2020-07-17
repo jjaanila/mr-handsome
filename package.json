@@ -4,7 +4,7 @@
   "dependencies": {
     "bunyan": "1.8.0",
     "discord.js": "^11.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "request-promise": "2.0.1"
   },
   "devDependencies": {},
